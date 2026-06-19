@@ -5,80 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kitchen</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --bg:#0f0e0c; --surface:#1a1815; --card:#221f1b; --border:#2e2a25;
-  --accent:#e8a838; --accent2:#f0c870; --text:#f0ebe3; --muted:#8a8070;
-  --green:#5cba8a; --red:#e86060; --input-bg:#2a2520; --orange:#f07030; --blue:#4a9eff;
-}
+:root{--bg:#0f0e0c;--surface:#1a1815;--card:#221f1b;--border:#2e2a25;--accent:#e8a838;--accent2:#f0c870;--text:#f0ebe3;--muted:#8a8070;--green:#5cba8a;--red:#e86060;--input-bg:#2a2520;--orange:#f07030;--blue:#4a9eff;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:20px;}
-
-/* PIN */
 .pin-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;}
 .pin-screen h2{font-family:'Playfair Display',serif;font-size:24px;color:var(--accent2);margin-bottom:6px;}
 .pin-screen p{font-size:13px;color:var(--muted);margin-bottom:28px;}
 .pin-dots{display:flex;gap:14px;margin-bottom:24px;}
-.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--border);transition:background 0.2s;}
+.pin-dot{width:16px;height:16px;border-radius:50%;background:var(--border);transition:background 0.2s;}
 .pin-dot.filled{background:var(--accent);}
 .pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
-.pin-key{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;font-size:20px;font-weight:600;cursor:pointer;text-align:center;color:var(--text);transition:background 0.15s;}
+.pin-key{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;font-size:20px;font-weight:600;cursor:pointer;text-align:center;color:var(--text);}
 .pin-key:active{background:var(--input-bg);}
 .pin-error{color:var(--red);font-size:13px;margin-top:14px;min-height:20px;}
-
 header{background:linear-gradient(135deg,#0d1a0f,#122010);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-.header-left{display:flex;align-items:center;gap:10px;}
 .logo{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.header-left{display:flex;align-items:center;gap:10px;}
 header h1{font-family:'Playfair Display',serif;font-size:18px;color:var(--accent2);}
 header p{font-size:11px;color:var(--muted);}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
 .container{max-width:700px;margin:0 auto;padding:16px 14px;}
 .section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .badge{background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px;}
-
-/* KITCHEN ORDER CARD */
-.k-card{background:var(--card);border:2px solid var(--blue);border-radius:16px;margin-bottom:14px;overflow:hidden;animation:slideIn 0.25s ease;}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.k-card{background:var(--card);border:2px solid var(--blue);border-radius:16px;margin-bottom:14px;overflow:hidden;}
+.k-card.done{border-color:var(--border);opacity:0.6;}
 .k-card-header{padding:14px 16px 10px;display:flex;align-items:center;gap:10px;}
 .k-order-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--blue);}
-.k-customer-info{flex:1;}
+.k-card.done .k-order-num{color:var(--green);}
 .k-customer-name{font-size:15px;font-weight:600;}
 .k-order-time{font-size:11px;color:var(--muted);margin-top:2px;}
 .k-total{font-size:16px;font-weight:700;color:var(--green);}
-
 .k-items{padding:0 16px 14px;}
 .k-item-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(46,42,37,0.6);}
 .k-item-row:last-child{border-bottom:none;}
 .k-item-name{flex:1;font-size:14px;line-height:1.3;}
 .k-item-qty{background:rgba(74,158,255,0.15);color:var(--blue);font-size:13px;font-weight:700;padding:4px 12px;border-radius:8px;min-width:36px;text-align:center;}
-
-.k-ready-btn{width:calc(100% - 32px);margin:0 16px 16px;background:var(--green);color:#0a1a12;border:none;border-radius:12px;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.15s;}
-.k-ready-btn:active{opacity:0.8;}
-
-/* DONE CARD */
-.k-card.done{border-color:var(--border);opacity:0.55;}
-.k-card.done .k-order-num{color:var(--green);}
+.k-ready-btn{width:calc(100% - 32px);margin:0 16px 16px;background:var(--green);color:#0a1a12;border:none;border-radius:12px;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
 .done-label{display:flex;align-items:center;gap:6px;padding:0 16px 14px;font-size:13px;color:var(--green);font-weight:600;}
-
-/* EMPTY */
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-icon{font-size:50px;margin-bottom:14px;}
-
 .toast{position:fixed;top:18px;right:14px;background:var(--green);color:#0a1a12;font-weight:600;font-size:13px;padding:9px 15px;border-radius:10px;z-index:1000;opacity:0;transform:translateY(-10px);transition:opacity 0.3s,transform 0.3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
-
-<!-- PIN SCREEN -->
 <div class="pin-screen" id="pinScreen">
   <h2>Kitchen</h2>
   <p>Enter PIN to access</p>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
     <div class="pin-dot" id="d2"></div>
   </div>
   <div class="pin-keypad">
@@ -89,7 +70,6 @@ header p{font-size:11px;color:var(--muted);}
   </div>
   <div class="pin-error" id="pinError"></div>
 </div>
-
 <header>
   <div class="header-left">
     <div class="logo">👨‍🍳</div>
@@ -97,93 +77,62 @@ header p{font-size:11px;color:var(--muted);}
   </div>
   <div class="live-dot"></div>
 </header>
-
 <div class="container">
   <div class="section-title">Active Orders <span class="badge" id="activeCount">0</span></div>
   <div id="kitchenOrders"></div>
 </div>
-
 <div class="toast" id="toast"></div>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAk-H09EvvwzVweDzNxlh9QWKkzS_Kid9A",
+  authDomain:"order-app-cf538.firebaseapp.com",
+  databaseURL:"https://order-app-cf538-default-rtdb.firebaseio.com",
+  projectId:"order-app-cf538",
+  storageBucket:"order-app-cf538.firebasestorage.app",
+  messagingSenderId:"506383247047",
+  appId:"1:506383247047:web:d96eb4504231e2d06040e2"
+});
+var db=firebase.database();
+var CORRECT_PIN='222';
+var pinVal='';
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAk-H09EvvwzVweDzNxlh9QWKkzS_Kid9A",
-  authDomain: "order-app-cf538.firebaseapp.com",
-  databaseURL: "https://order-app-cf538-default-rtdb.firebaseio.com",
-  projectId: "order-app-cf538",
-  storageBucket: "order-app-cf538.firebasestorage.app",
-  messagingSenderId: "506383247047",
-  appId: "1:506383247047:web:d96eb4504231e2d06040e2"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const CORRECT_PIN = '222';
-let pinVal = '';
-
-
-
-function updatePinDots() {
-  for(let i=0;i<3;i++) document.getElementById('d'+i).className='pin-dot'+(i<pinVal.length?' filled':'');
+function updatePinDots(){for(var i=0;i<3;i++)document.getElementById('d'+i).className='pin-dot'+(i<pinVal.length?' filled':'');}
+function checkPin(){
+  if(pinVal===CORRECT_PIN){document.getElementById('pinScreen').style.display='none';startListening();}
+  else{document.getElementById('pinError').textContent='Wrong PIN. Try again.';setTimeout(function(){pinVal='';updatePinDots();document.getElementById('pinError').textContent='';},900);}
 }
+document.querySelectorAll('.pin-key').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var k=btn.getAttribute('data-key');
+    if(k==='back'){pinVal=pinVal.slice(0,-1);updatePinDots();}
+    else{if(pinVal.length>=3)return;pinVal+=k;updatePinDots();if(pinVal.length===3)checkPin();}
+  });
+});
 
-function startListening() {
-  onValue(ref(db,'orders'), snap => {
-    const all = snap.val() || {};
-    const entries = Object.entries(all)
-      .filter(([,o]) => o.status==='confirmed' || o.status==='ready')
-      .sort((a,b) => (a[1].confirmedAt||0)-(b[1].confirmedAt||0));
-
-    const activeCount = entries.filter(([,o])=>o.status==='confirmed').length;
-    document.getElementById('activeCount').textContent = activeCount;
-
-    const el = document.getElementById('kitchenOrders');
-    if (!entries.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🍽️</div><div>No orders yet — waiting for orders from counter</div></div>`;
-      return;
-    }
-
-    el.innerHTML = entries.map(([key,o]) => {
-      const time = o.confirmedAt ? new Date(o.confirmedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '';
-      const isDone = o.status==='ready';
-      const items = (o.items||[]).map(item=>`
-        <div class="k-item-row">
-          <span class="k-item-name">${item.name}</span>
-          <span class="k-item-qty">×${item.qty}</span>
-        </div>`).join('');
-
-      return `<div class="k-card${isDone?' done':''}">
-        <div class="k-card-header">
-          <span class="k-order-num">#${o.orderNumber||'—'}</span>
-          <div class="k-customer-info">
-            <div class="k-customer-name">${o.customerName||'Walk-in'}</div>
-            <div class="k-order-time">${time}${o.source==='counter'?' · Walk-in':''}</div>
-          </div>
-          <span class="k-total">₹${o.total}</span>
-        </div>
-        <div class="k-items">${items}</div>
-        ${isDone
-          ? `<div class="done-label">✅ Order Ready — delivered</div>`
-          : `<button class="k-ready-btn" onclick="window._markReady('${key}', ${o.orderNumber})">✓ Order Ready</button>`
-        }
-      </div>`;
+function startListening(){
+  db.ref('orders').on('value',function(snap){
+    var all=snap.val()||{};
+    var entries=Object.entries(all).filter(function(e){return e[1].status==='confirmed'||e[1].status==='ready';}).sort(function(a,b){return (a[1].confirmedAt||0)-(b[1].confirmedAt||0);});
+    var activeCount=entries.filter(function(e){return e[1].status==='confirmed';}).length;
+    document.getElementById('activeCount').textContent=activeCount;
+    var el=document.getElementById('kitchenOrders');
+    if(!entries.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🍽️</div><div>No orders yet</div></div>';return;}
+    el.innerHTML=entries.map(function(e){
+      var key=e[0],o=e[1];
+      var time=o.confirmedAt?new Date(o.confirmedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'';
+      var isDone=o.status==='ready';
+      var items=(o.items||[]).map(function(item){return '<div class="k-item-row"><span class="k-item-name">'+item.name+'</span><span class="k-item-qty">×'+item.qty+'</span></div>';}).join('');
+      return '<div class="k-card'+(isDone?' done':'')+'"><div class="k-card-header"><span class="k-order-num">#'+(o.orderNumber||'—')+'</span><div style="flex:1"><div class="k-customer-name">'+(o.customerName||'Walk-in')+'</div><div class="k-order-time">'+time+(o.source==='counter'?' · Walk-in':'')+'</div></div><span class="k-total">₹'+o.total+'</span></div><div class="k-items">'+items+'</div>'+(isDone?'<div class="done-label">✅ Ready — delivered</div>':'<button class="k-ready-btn" data-key="'+key+'" data-num="'+(o.orderNumber||'')+'">✓ Order Ready</button>')+'</div>';
     }).join('');
+    el.querySelectorAll('.k-ready-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        db.ref('orders/'+btn.getAttribute('data-key')).update({status:'ready',readyAt:Date.now()});
+        showToast('Order #'+btn.getAttribute('data-num')+' marked ready!');
+      });
+    });
   });
 }
-
-window._markReady = function(key, orderNum) {
-  update(ref(db,'orders/'+key), {status:'ready', readyAt:Date.now()});
-  showToast('Order #'+orderNum+' marked as ready!');
-};
-
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2400);
-}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2400);}
 </script>
 </body>
 </html>
