@@ -141,7 +141,7 @@ header p{font-size:11px;color:var(--muted);}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-firebase.initializeApp({
+if(!firebase.apps.length){firebase.initializeApp({
   apiKey:"AIzaSyAk-H09EvvwzVweDzNxlh9QWKkzS_Kid9A",
   authDomain:"order-app-cf538.firebaseapp.com",
   databaseURL:"https://order-app-cf538-default-rtdb.firebaseio.com",
@@ -149,7 +149,7 @@ firebase.initializeApp({
   storageBucket:"order-app-cf538.firebasestorage.app",
   messagingSenderId:"506383247047",
   appId:"1:506383247047:web:d96eb4504231e2d06040e2"
-});
+});}
 var db=firebase.database();
 var CORRECT_PIN='333';
 var pinVal='', allOrders={}, currentFilter='all';
