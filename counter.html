@@ -126,7 +126,7 @@ header p{font-size:11px;color:var(--muted);}
   <p>Enter PIN to access</p>
   <div class="pin-dots" id="pinDots">
     <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    <div class="pin-dot" id="d2"></div>
   </div>
   <div class="pin-keypad">
     <button class="pin-key" data-key="1">1</button><button class="pin-key" data-key="2">2</button><button class="pin-key" data-key="3">3</button>
@@ -227,7 +227,7 @@ let pinVal = '';
 
 
 function updatePinDots() {
-  for (let i=0;i<4;i++) document.getElementById('d'+i).className = 'pin-dot' + (i<pinVal.length?' filled':'');
+  for (let i=0;i<3;i++) document.getElementById('d'+i).className = 'pin-dot' + (i<pinVal.length?' filled':'');
 }
 
 function checkPin() {
@@ -248,9 +248,9 @@ document.querySelectorAll('.pin-key[data-key]').forEach(btn => {
     const k = btn.getAttribute('data-key');
     if (k === 'back') { pinVal = pinVal.slice(0,-1); updatePinDots(); }
     else {
-      if (pinVal.length >= 4) return;
+      if (pinVal.length >= 3) return;
       pinVal += k; updatePinDots();
-      if (pinVal.length === 4) checkPin();
+      if (pinVal.length === 3) checkPin();
     }
   });
 });

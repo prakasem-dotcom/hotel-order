@@ -142,7 +142,7 @@ header p { font-size: 11px; color: var(--muted); margin-top: 1px; }
     <div class="search-row">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="Search by name or code…" autocomplete="off">
-      <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+      <button class="clear-btn" id="clearBtn">✕</button>
     </div>
   </div>
 
@@ -176,7 +176,7 @@ header p { font-size: 11px; color: var(--muted); margin-top: 1px; }
     <span class="total-label">Total</span>
     <span class="total-amount" id="totalAmount">₹0</span>
   </div>
-  <button class="place-btn" id="placeBtn" onclick="placeOrder()" disabled>Place Order</button>
+  <button class="place-btn" id="placeBtn" disabled>Place Order</button>
 </div>
 
 <!-- ORDER STATUS SCREEN -->
@@ -332,7 +332,9 @@ async function placeOrder() {
     if (d.orderNumber) document.getElementById('orderNumberDisplay').textContent = '#' + d.orderNumber;
   });
 }
-window.placeOrder = placeOrder;
+// Wire buttons via event listeners (module scope safe)
+document.getElementById('placeBtn').addEventListener('click', placeOrder);
+document.getElementById('clearBtn').addEventListener('click', clearSearch);
 
 function updateStatusUI(status) {
   const numEl = document.getElementById('orderNumberDisplay');
