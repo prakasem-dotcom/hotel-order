@@ -150,6 +150,7 @@ header p{font-size:11px;color:var(--muted);margin-top:1px;}
 .order-items-summary h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;}
 .order-item-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--border);}
 .order-item-row:last-child{border-bottom:none;}
+.order-item-row.item-ready{color:var(--green);}
 .status-pulse{width:10px;height:10px;border-radius:50%;background:var(--orange);display:inline-block;margin-right:6px;animation:blink 1.5s infinite;}
 .status-pulse.confirmed{background:#4a9eff;}
 .status-pulse.ready,.status-pulse.cancelled{animation:none;}
@@ -171,7 +172,7 @@ header p{font-size:11px;color:var(--muted);margin-top:1px;}
 <div class="container">
   <!-- NAME (optional) -->
   <div class="name-section">
-    <label>Your Name <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <label>Your Name <span style="color:var(--red);font-size:14px">*</span></label>
     <input type="text" class="name-input" id="customerName" placeholder="Enter your name..." autocomplete="off">
   </div>
 
@@ -394,7 +395,8 @@ document.getElementById('cartBarSummary').addEventListener('click', function(e) 
 
 /* ── PLACE ORDER ── */
 document.getElementById('placeBtn').addEventListener('click', function() {
-  var name = document.getElementById('customerName').value.trim() || 'Guest';
+  var name = document.getElementById('customerName').value.trim();
+  if(!name){showToast('Please enter your name first');document.getElementById('customerName').focus();return;}
   var keys = Object.keys(cart);
   if (!keys.length) return;
 
@@ -418,9 +420,7 @@ document.getElementById('placeBtn').addEventListener('click', function() {
   });
 
   document.getElementById('statusScreen').classList.add('visible');
-  document.getElementById('orderItemsList').innerHTML = items.map(function(i){
-    return '<div class="order-item-row"><span>' + i.name + ' x' + i.qty + '</span><span>Rs.' + i.total + '</span></div>';
-  }).join('');
+  renderOrderItems(items, {});
   updateStatusUI('pending');
 
   cart = {}; renderMenu(); updateCartBar();
@@ -430,8 +430,19 @@ document.getElementById('placeBtn').addEventListener('click', function() {
     var d = snap.val(); if (!d) return;
     updateStatusUI(d.status);
     if (d.orderNumber) document.getElementById('orderNumberDisplay').textContent = '#' + d.orderNumber;
+    if (d.items) renderOrderItems(d.items, d.readyItems||{});
   });
 });
+
+function renderOrderItems(items, readyItems) {
+  document.getElementById('orderItemsList').innerHTML = items.map(function(i, idx) {
+    var isReady = readyItems[idx] === true;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid var(--border);">' +
+      '<span style="' + (isReady?'color:var(--green);':'') + '">' + i.name + ' x' + i.qty + (isReady?' &#9989;':'') + '</span>' +
+      '<span>Rs.' + i.total + '</span>' +
+    '</div>';
+  }).join('');
+}
 
 function updateStatusUI(status) {
   var icons = {pending:'&#129534;', confirmed:'&#128104;&#8205;&#127859;', ready:'&#9989;', cancelled:'&#10060;'};
