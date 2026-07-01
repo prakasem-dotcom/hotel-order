@@ -32,6 +32,25 @@ header p{font-size:11px;color:var(--muted);margin-top:1px;}
 .name-input::placeholder{color:var(--muted);}
 
 /* search removed */
+/* STICKY TOTAL STRIP */
+.total-strip{
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(135deg,#1a1510,#221a0c);
+  border-bottom:1.5px solid var(--border);
+  padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.total-strip-label{font-size:12px;color:var(--muted);}
+.total-strip-items{font-size:12px;color:var(--muted);}
+.total-strip-amount{
+  font-family:'Playfair Display',serif;
+  font-size:24px;font-weight:700;
+  color:var(--accent2);
+  transition:all 0.2s;
+}
+.total-strip-amount.has-items{color:var(--accent);}
+
 
 /* SECTION TITLE */
 .section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
@@ -170,6 +189,15 @@ header p{font-size:11px;color:var(--muted);margin-top:1px;}
 </header>
 
 <div class="container">
+  <!-- TOTAL STRIP -->
+  <div class="total-strip" id="totalStrip">
+    <div>
+      <div class="total-strip-label">Your Total</div>
+      <div class="total-strip-items" id="stripItemCount">No items selected</div>
+    </div>
+    <div class="total-strip-amount" id="stripTotal">Rs. 0</div>
+  </div>
+
   <!-- NAME (optional) -->
   <div class="name-section">
     <label>Your Name <span style="color:var(--red);font-size:14px">*</span></label>
@@ -359,10 +387,23 @@ function getCartQty() {
 function updateCartBar() {
   var bar = document.getElementById('cartBar');
   var totalQty = getCartQty();
-  if (totalQty === 0) { bar.classList.remove('visible','expanded'); return; }
+  var totalAmt = getCartTotal();
+  // Update sticky strip always
+  var stripEl = document.getElementById('stripTotal');
+  var stripCount = document.getElementById('stripItemCount');
+  if (totalQty === 0) {
+    stripEl.textContent = 'Rs. 0';
+    stripEl.classList.remove('has-items');
+    stripCount.textContent = 'No items selected';
+    bar.classList.remove('visible','expanded');
+    return;
+  }
+  stripEl.textContent = 'Rs. ' + totalAmt;
+  stripEl.classList.add('has-items');
+  stripCount.textContent = totalQty + ' item' + (totalQty > 1 ? 's' : '') + ' selected';
   bar.classList.add('visible');
   document.getElementById('cartBarCount').textContent = totalQty + ' item' + (totalQty > 1 ? 's' : '');
-  document.getElementById('cartBarTotal').textContent = 'Rs.' + getCartTotal();
+  document.getElementById('cartBarTotal').textContent = 'Rs.' + totalAmt;
   renderCartPanel();
 }
 
