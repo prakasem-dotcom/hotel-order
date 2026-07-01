@@ -233,6 +233,10 @@ header p{font-size:11px;color:var(--muted);margin-top:1px;}
   <div class="order-items-summary">
     <h4>Items Ordered</h4>
     <div id="orderItemsList"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1.5px solid var(--border);">
+      <span style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;">Total to Pay</span>
+      <span id="orderTotalDisplay" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent2);">Rs.0</span>
+    </div>
   </div>
   <button class="new-order-btn" id="newOrderBtn">Place Another Order</button>
 </div>
@@ -461,6 +465,7 @@ document.getElementById('placeBtn').addEventListener('click', function() {
   });
 
   document.getElementById('statusScreen').classList.add('visible');
+  document.getElementById('orderTotalDisplay').textContent = 'Rs.' + total;
   renderOrderItems(items, {});
   updateStatusUI('pending');
 
